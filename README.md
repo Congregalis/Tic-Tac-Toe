@@ -15,4 +15,4 @@
 
 ## 运行
 
-执行 `npm start` 命令后在[http://localhost:3000](http://localhost:3000)查看效果
+先执行 `npm install` 安装依赖，再执行 `npm start` 后在 [http://localhost:3000](http://localhost:3000) 查看效果
