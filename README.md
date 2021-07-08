@@ -10,9 +10,11 @@
 - [x] 添加一个可以升序或降序显示历史记录的按钮
 - [x] 每当有人获胜时，高亮显示连成一线的 3 颗棋子
 - [x] 当无人获胜时，显示一个平局的消息
-- [x] 优化UI
+- [ ] 优化UI
 
 ## 效果
+
+在线查看：[https://tic-tac-toe-green-one.vercel.app/](https://tic-tac-toe-green-one.vercel.app/)
 
 ![](pics/1.png)
 ![](pics/2.png)
