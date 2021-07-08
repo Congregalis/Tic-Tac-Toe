@@ -182,8 +182,8 @@ class Game extends React.Component {
           style={{fontWeight: (move === this.state.stepNumber) ? "bold" : ""}}
           >
           <button className='button' onClick={() => this.jumpTo(move)}>{desc}</button>
-          &nbsp;
-          <a>{step['currStep'] ? 'coordinate: ' + step['currStep'] : '' }</a>
+          &nbsp;&nbsp;
+          <span>{step['currStep'] ? 'coordinate: ' + step['currStep'] : '' }</span>
         </li>
       );
     })
