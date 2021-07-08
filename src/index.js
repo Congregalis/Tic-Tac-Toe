@@ -4,7 +4,7 @@ import './index.css';
 
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
+    <button className={props.className} onClick={props.onClick}>
       {props.value}
     </button>
   );
@@ -34,7 +34,10 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return {
+        winner: squares[a],
+        line: lines[i]
+      }      
     }
   }
   return null;
@@ -43,8 +46,14 @@ function calculateWinner(squares) {
 class Board extends React.Component {
   
   renderSquare(i) {
+    const line = this.props.winnerLines;
+    const [a, b, c] = line;
+    let className =  (i === a || i === b || i === c) ? 'squareWinner' : 'square';
+
     return (
       <Square
+        key={i}
+        className={className}
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
       />
@@ -52,24 +61,46 @@ class Board extends React.Component {
   }
 
   render() {
-    return (
-      <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
+
+    let row = [0, 1, 2];
+    let cell = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8]
+    ];
+    let checkerboard = row.map((item, index) => (
+      <div className="board-row" key={index}>
+        {
+          cell.map((item1, index1) => 
+            index === index1 ? 
+              item1.map((item2, index2) => (
+                this.renderSquare(item2)
+              )) :
+              ""
+          )
+        }
       </div>
+    ));
+
+    return (
+      checkerboard
+      // <div>
+      //   <div className="board-row">
+      //     {this.renderSquare(0)}
+      //     {this.renderSquare(1)}
+      //     {this.renderSquare(2)}
+      //   </div>
+      //   <div className="board-row">
+      //     {this.renderSquare(3)}
+      //     {this.renderSquare(4)}
+      //     {this.renderSquare(5)}
+      //   </div>
+      //   <div className="board-row">
+      //     {this.renderSquare(6)}
+      //     {this.renderSquare(7)}
+      //     {this.renderSquare(8)}
+      //   </div>
+      // </div>
     );
   }
 }
@@ -85,6 +116,8 @@ class Game extends React.Component {
       }],
       stepNumber: 0,
       xIsNext: true,
+      isAscendingOrder: true,
+      winnerLines: [], // 存储胜利时需要高亮的三连棋
     };
   }
 
@@ -98,6 +131,12 @@ class Game extends React.Component {
       return;
     }
     squares[i] = this.state.xIsNext ? 'X' : 'O';
+    // 如果出现了胜利者，更新三连棋使其高亮
+    if (calculateWinner(squares)) {
+      this.setState({
+        winnerLines: calculateWinner(squares).line
+      })
+    }
     this.setState({
       history: history.concat([{
         squares: squares,
@@ -109,16 +148,29 @@ class Game extends React.Component {
   }
   
   jumpTo(step) {
+    const history = this.state.history;
+    const current = history[step];
+    const squares = current.squares.slice();
+    let line = calculateWinner(squares) ? calculateWinner(squares).line : [];
+
     this.setState({
       stepNumber: step,
       xIsNext: (step % 2) === 0,
+      winnerLines: line
     });
+  }
+
+  reverseHistory = () => {
+    const isAscendingOrder = this.state.isAscendingOrder;
+    this.setState({
+      isAscendingOrder: !isAscendingOrder
+    })
   }
   
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.squares);
+    const winner = calculateWinner(current.squares) ? calculateWinner(current.squares).winner : null;
     const moves = history.map((step, move) => {
       const desc = move ?
             'Go to step #' + move :
@@ -129,12 +181,15 @@ class Game extends React.Component {
           key={move} 
           style={{fontWeight: (move === this.state.stepNumber) ? "bold" : ""}}
           >
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button className='button' onClick={() => this.jumpTo(move)}>{desc}</button>
           &nbsp;
           <a>{step['currStep'] ? 'coordinate: ' + step['currStep'] : '' }</a>
         </li>
       );
     })
+    if (!this.state.isAscendingOrder) {
+      moves.reverse()
+    }
     
     let status;
     if (winner) {
@@ -145,16 +200,28 @@ class Game extends React.Component {
     }
     
     return (
-      <div className="game">
-        <div className="game-board">
-          <Board
-            squares={current.squares}
-            onClick={(i) => this.handleClick(i)}
-          />
-        </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <ol>{moves}</ol>
+      <div>
+        <h1> Tic-Tac-Toe </h1>
+        <div className="game">
+          <div className="game-board">
+            <Board
+              squares={current.squares}
+              onClick={(i) => this.handleClick(i)}
+              winnerLines={this.state.winnerLines}
+            />
+          </div>
+          <div className="game-info">
+            <div className="info-top">
+              <div className='status'>{status}</div>
+              <button
+                className='reverse-button'
+                onClick={() => this.reverseHistory()}
+              >
+                {this.state.isAscendingOrder ? 'Descend' : 'Ascend'}
+              </button>
+            </div>
+            <ol>{moves}</ol>
+          </div>
         </div>
       </div>
     );
