@@ -1,6 +1,7 @@
 body {
   font: 14px "Century Gothic", Futura, sans-serif;
   margin: 20px;
+  text-align: center;
 }
 
 ol, ul {
@@ -58,8 +59,15 @@ ol, ul {
 }
 
 .game {
-  display: flex;
-  flex-direction: row;
+  /* display: flex;
+  flex-direction: column; */
+  text-align: center;
+}
+
+.game-board {
+  width: 100px;
+  margin: auto;
+  margin-bottom: 15px;
 }
 
 .game-info {
@@ -111,4 +119,13 @@ ol, ul {
 .button:hover {
   background-color: #555555;
   color: white;
+}
+
+ol {
+  width: 240px;
+  margin: auto;
+}
+
+li {
+  margin-left: 0%;
 }
